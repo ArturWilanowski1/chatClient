@@ -3,21 +3,24 @@ package pl.wilanowskiartur.models;
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @ClientEndpoint
 public class SocketConnector {
 
     private static SocketConnector ourInstance = new SocketConnector();
-
     public static SocketConnector getInstance() {
         return ourInstance;
     }
 
     private WebSocketContainer container;
     private Session session;
+    private List<SocketObserver> socketObservers;
 
     private SocketConnector(){
         container = ContainerProvider.getWebSocketContainer();
+        socketObservers = new ArrayList<>();
     }
 
     public void connect(){
@@ -47,8 +50,12 @@ public class SocketConnector {
     }
 
     @OnMessage
-    public void onMessage(Session session, String message){
-        System.out.println(message);
+    public void onMessage(Session session, final String message){
+        socketObservers.forEach(s -> s.onMessage(message));
+    }
+
+    public void registerObserver(SocketObserver observer){
+        socketObservers.add(observer);
     }
 
 

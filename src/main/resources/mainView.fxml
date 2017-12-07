@@ -21,7 +21,7 @@
          <children>
             <TextArea fx:id="textMessage" editable="false" layoutX="6.0" layoutY="3.0" prefHeight="429.0" prefWidth="601.0" />
             <TextField fx:id="textWriteMessage" layoutY="442.0" prefHeight="53.0" prefWidth="507.0" promptText="Wpisz wiadomość" />
-            <Button fx:id="huttonSend" layoutX="511.0" layoutY="445.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="82.0" text="Wyślij" />
+            <Button fx:id="buttonSend" layoutX="511.0" layoutY="445.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="82.0" text="Wyślij" />
          </children>
       </AnchorPane>
    </children>

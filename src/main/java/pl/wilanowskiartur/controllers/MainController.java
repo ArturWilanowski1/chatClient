@@ -9,11 +9,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import pl.wilanowskiartur.models.SocketConnector;
+import pl.wilanowskiartur.models.SocketObserver;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable{
+public class MainController implements Initializable, SocketObserver{
 
         @FXML
         private TextArea textMessage;
@@ -28,18 +29,32 @@ public class MainController implements Initializable{
 
     public void initialize(URL location, ResourceBundle resources) {
         clickEnterOnWriteMessage();
+        clickButtonSend();
+        textMessage.setWrapText(true);
+
         socketConnector.connect();
-        socketConnector.sendMessage("Ping");
+        socketConnector.registerObserver(this);
+    }
+
+    private void clickButtonSend(){
+        buttonSend.setOnMouseClicked(event -> sendAndClear());
     }
 
     private void clickEnterOnWriteMessage() {
-        textWriteMessage.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            public void handle(KeyEvent event) {
+        textWriteMessage.setOnKeyPressed(event ->  {
                 if (event.getCode() == KeyCode.ENTER){
-                    socketConnector.sendMessage(textWriteMessage.getText());
-                    textWriteMessage.clear();
+                    sendAndClear();
                 }
-            }
         });
+    }
+
+    private void sendAndClear(){
+        if (!textWriteMessage.getText().isEmpty())
+        socketConnector.sendMessage(textWriteMessage.getText());
+        textWriteMessage.clear();
+    }
+
+    public void onMessage(String s) {
+        textMessage.appendText(s);
     }
 }
