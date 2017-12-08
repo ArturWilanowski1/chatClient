@@ -1,5 +1,7 @@
 package pl.wilanowskiartur.models;
 
+import javafx.application.Platform;
+
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -51,7 +53,9 @@ public class SocketConnector {
 
     @OnMessage
     public void onMessage(Session session, final String message){
-        socketObservers.forEach(s -> s.onMessage(message));
+        socketObservers.forEach(s -> {
+            Platform.runLater(() -> s.onMessage(message));
+        });
     }
 
     public void registerObserver(SocketObserver observer){
