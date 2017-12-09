@@ -2,6 +2,7 @@ package pl.wilanowskiartur.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,6 +17,8 @@ import pl.wilanowskiartur.models.SocketConnector;
 import pl.wilanowskiartur.models.SocketObserver;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable, SocketObserver{
@@ -32,11 +35,18 @@ public class MainController implements Initializable, SocketObserver{
         @FXML
         private Button buttonSend;
 
+        private List <String> commandList;
+        private int index;
+
     private SocketConnector socketConnector = SocketConnector.getInstance();
 
     public void initialize(URL location, ResourceBundle resources) {
+        commandList = new ArrayList<>();
         clickEnterOnWriteMessage();
         clickButtonSend();
+
+        textMessage.setWrapText(true);
+
         textMessage.setWrapText(true);
 
         socketConnector.connect();
@@ -51,14 +61,28 @@ public class MainController implements Initializable, SocketObserver{
         textWriteMessage.setOnKeyPressed(event ->  {
                 if (event.getCode() == KeyCode.ENTER){
                     sendAndClear();
+                }else if (event.getCode() == KeyCode.UP){
+                    parseUpKey();
                 }
         });
     }
 
+    private void parseUpKey() {
+        textWriteMessage.setText(commandList.get(index));
+        if (index - 1 < 0) {
+            index = commandList.size() - 1;
+        } else {
+            index--;
+        }
+    }
+
     private void sendAndClear(){
-        if (!textWriteMessage.getText().isEmpty())
-        sendMessagePacket(textWriteMessage.getText());
-        textWriteMessage.clear();
+        if (!textWriteMessage.getText().isEmpty()) {
+            commandList.add(textWriteMessage.getText());
+            index = commandList.size() - 1;
+            sendMessagePacket(textWriteMessage.getText());
+            textWriteMessage.clear();
+        }
     }
 
     private void sendMessagePacket(String message){
@@ -83,6 +107,10 @@ public class MainController implements Initializable, SocketObserver{
                 alert.setTitle("Serwer");
                 alert.setContentText(messageModel.getContext());
                 alert.show();
+                break;
+            }
+            case CLOSE_WINDOW:{
+                Platform.exit();
                 break;
             }
         }
